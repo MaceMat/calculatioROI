@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './ROICalculator.css';
 
 function ROICalculator() {
@@ -11,23 +11,23 @@ function ROICalculator() {
   const [maintenanceHoursSaved, setMaintenanceHoursSaved] = useState(null);
   const [maintenanceDollarSavings, setMaintenanceDollarSavings] = useState(null);
 
-  const calculateROI = () => {
-    // Calculate manual testing hours saved
+  const calculateROI = useCallback(() => {
     const hoursSaved = testCases * releases * (regressionCoverage / 100);
     setManualHoursSaved(hoursSaved);
 
-    // Calculate savings in dollar value for manual testing
     const dollarSavings = hoursSaved * 36;
     setManualDollarSavings(dollarSavings);
 
-    // Calculate savings in maintenance effort in person hours
-    const maintenanceHours = hoursSaved * 0.1; // Assuming 10% of manual hours saved in maintenance
+    const maintenanceHours = hoursSaved * 0.1;
     setMaintenanceHoursSaved(maintenanceHours);
 
-    // Calculate savings in dollar value for maintenance effort
     const maintenanceDollar = maintenanceHours * 40;
     setMaintenanceDollarSavings(maintenanceDollar);
-  };
+  }, [testCases, releases, regressionCoverage]);
+
+  useEffect(() => {
+    calculateROI();
+  }, [testCases, releases, regressionCoverage, calculateROI]);
 
   return (
     <div className="roi-calculator">
@@ -68,7 +68,6 @@ function ROICalculator() {
           onChange={(e) => setRegressionCoverage(e.target.value)}
         />
       </label>
-      <button onClick={calculateROI}>Calculate ROI</button>
       {manualHoursSaved !== null && (
         <div className="output-fields">
           <div>
